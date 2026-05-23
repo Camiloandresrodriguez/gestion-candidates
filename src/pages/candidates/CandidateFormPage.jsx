@@ -1,6 +1,39 @@
 import { Link } from 'react-router-dom'
+import { end_points } from '../../services/api'
+import { useState, useEffect } from 'react';
 
 export default function CandidateFormPage() {
+  const [getCandidates, setCandidates] = useState([]);
+
+  function fetchData() {
+    fetch("https://app-gestion-candidatos-am-api.onrender.com/candidates")
+      .then((response) => response.json())
+      .then((data) => setCandidates(data));
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  function createCandidate(e) {
+    e.preventDefault()
+    const formData = new FormData(e.target)
+    let data = Object.fromEntries(formData.entries())
+    let skills = data.skills.split(", ")
+    data.skills = skills
+    data.createdAt = new Date()
+    let auth = getCandidates.some((item) => item.email === data.email)
+    if (auth) {
+      return alert("El candidato ya está registrado")
+    }
+    fetch(end_points.candidates, {
+      method: "POST",
+      body: JSON.stringify(data)
+    })
+      .then((reponse) => reponse.json())
+      .then(()=> fetchData())
+  }
+
   return (
     <section className="page">
       <header className="page__header">
@@ -27,7 +60,7 @@ export default function CandidateFormPage() {
         </div>
       </header>
 
-      <form className="form">
+      <form onSubmit={createCandidate} className="form">
         <div className="grid grid--2">
           <section className="card">
             <header className="card__header">
@@ -43,6 +76,7 @@ export default function CandidateFormPage() {
                   Full name
                 </label>
                 <input
+                  name='fullName'
                   id="cFullName"
                   className="input"
                   placeholder="Ana Martínez"
@@ -55,6 +89,7 @@ export default function CandidateFormPage() {
                 </label>
                 <input
                   id="cEmail"
+                  name='email'
                   className="input"
                   type="email"
                   placeholder="ana.martinez@gmail.com"
@@ -66,6 +101,7 @@ export default function CandidateFormPage() {
                   Phone
                 </label>
                 <input
+                  name='phone'
                   id="cPhone"
                   className="input"
                   placeholder="+57 301 555 0101"
@@ -76,7 +112,7 @@ export default function CandidateFormPage() {
                 <label className="label" htmlFor="cLocation">
                   Location
                 </label>
-                <input id="cLocation" className="input" placeholder="Bogotá, CO" />
+                <input name='location' id="cLocation" className="input" placeholder="Bogotá, CO" />
               </div>
             </div>
           </section>
@@ -94,7 +130,7 @@ export default function CandidateFormPage() {
                 <label className="label" htmlFor="cSeniority">
                   Seniority
                 </label>
-                <select id="cSeniority" className="select">
+                <select name="seniority" id="cSeniority" className="select">
                   <option>Junior</option>
                   <option>Mid</option>
                   <option>Senior</option>
@@ -106,14 +142,14 @@ export default function CandidateFormPage() {
                 <label className="label" htmlFor="cYears">
                   Years of experience
                 </label>
-                <input id="cYears" className="input" type="number" placeholder="1" />
+                <input name='yearsExperience' id="cYears" className="input" type="number" placeholder="1" />
               </div>
 
               <div className="field">
                 <label className="label" htmlFor="cStatus">
                   Status
                 </label>
-                <select id="cStatus" className="select">
+                <select name="status" id="cStatus" className="select">
                   <option>New</option>
                   <option>In review</option>
                   <option>Interview</option>
@@ -126,7 +162,7 @@ export default function CandidateFormPage() {
                 <label className="label" htmlFor="cOffer">
                   Applied offer
                 </label>
-                <select id="cOffer" className="select">
+                <select name='appliedOfferId' id="cOffer" className="select">
                   <option>Backend Developer (Node.js)</option>
                   <option>Frontend Developer (React)</option>
                   <option>QA Engineer</option>
@@ -149,25 +185,12 @@ export default function CandidateFormPage() {
               <label className="label" htmlFor="cSkill">
                 New skill
               </label>
-              <input id="cSkill" className="input" placeholder="React" />
-            </div>
-            <div className="field">
-              <label className="label" htmlFor="cSkillLevel">
-                Level
-              </label>
-              <select id="cSkillLevel" className="select">
-                <option>Beginner</option>
-                <option>Intermediate</option>
-                <option>Advanced</option>
-              </select>
+              <input name='skills' id="cSkill" className="input" placeholder="React" />
             </div>
             <div className="field field--actions">
               <label className="label" aria-hidden="true">
                 Add
               </label>
-              <button className="btn btn--primary" type="button">
-                Add skill
-              </button>
             </div>
           </div>
 
@@ -178,6 +201,9 @@ export default function CandidateFormPage() {
             <span className="chip">CSS</span>
           </div>
         </section>
+        <button className="btn btn--primary" type="submit">
+          Save
+        </button>
       </form>
     </section>
   )
