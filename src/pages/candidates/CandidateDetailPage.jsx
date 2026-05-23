@@ -1,6 +1,26 @@
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import { useState, useEffect } from 'react';
+import { end_points } from '../../services/api';
 
 export default function CandidateDetailPage() {
+  const [candidate, setCandidate] = useState({});
+  let id = useParams()
+
+  console.log(candidate.skills)
+
+  function fetchData() {
+    fetch(end_points.candidates + "/" + id.candidateId)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data)
+        setCandidate(data)
+      });
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <section className="page">
       <header className="page__header">
@@ -14,9 +34,9 @@ export default function CandidateDetailPage() {
             </span>
             <span className="breadcrumbs__current">Profile</span>
           </div>
-          <h1 className="page__title">Ana Martínez</h1>
+          <h1 className="page__title">{candidate.fullName}</h1>
           <p className="page__subtitle">
-            Junior · Bogotá, CO · ana.martinez@gmail.com
+            {candidate.seniority} · {candidate.location} · {candidate.email}
           </p>
         </div>
         <div className="page__actions">
@@ -42,31 +62,31 @@ export default function CandidateDetailPage() {
           <div className="dl">
             <div className="dl__row">
               <div className="dl__key">Full name</div>
-              <div className="dl__value">Ana Martínez</div>
+              <div className="dl__value">{candidate.fullName}</div>
             </div>
             <div className="dl__row">
               <div className="dl__key">Email</div>
-              <div className="dl__value">ana.martinez@gmail.com</div>
+              <div className="dl__value">{candidate.email}</div>
             </div>
             <div className="dl__row">
               <div className="dl__key">Phone</div>
-              <div className="dl__value">+57 301 555 0101</div>
+              <div className="dl__value">{candidate.phone}</div>
             </div>
             <div className="dl__row">
               <div className="dl__key">Location</div>
-              <div className="dl__value">Bogotá, CO</div>
+              <div className="dl__value">{candidate.location}</div>
             </div>
             <div className="dl__row">
               <div className="dl__key">Seniority</div>
-              <div className="dl__value">Junior</div>
+              <div className="dl__value">{candidate.seniority}</div>
             </div>
             <div className="dl__row">
-              <div className="dl__key">Years experience</div>
+              <div className="dl__key">{candidate.yearsExperience}</div>
               <div className="dl__value">1</div>
             </div>
             <div className="dl__row">
               <div className="dl__key">Created at</div>
-              <div className="dl__value">2026-03-01</div>
+              <div className="dl__value">{candidate.createdAt}</div>
             </div>
           </div>
         </section>
@@ -100,10 +120,11 @@ export default function CandidateDetailPage() {
 
           <h3 className="section-title">Skills</h3>
           <div className="chips">
-            <span className="chip">React</span>
-            <span className="chip">JavaScript</span>
-            <span className="chip">HTML</span>
-            <span className="chip">CSS</span>
+            {
+              candidate.skills && candidate.skills.map((skill) => (
+                <span className="chip">{skill}</span>
+              ))
+            }
           </div>
 
           <div className="divider" />

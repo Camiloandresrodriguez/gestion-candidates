@@ -131,7 +131,7 @@ export default function CandidatesListPage() {
                     </td>
                     <td className="right">
                       <div className="row-actions">
-                        <Link className="btn btn--sm" to="/candidates/1">
+                        <Link className="btn btn--sm" to={"/candidates/"+candidate.id}>
                           Open
                         </Link>
                         <Link className="btn btn--sm" to="/candidates/1/edit">
